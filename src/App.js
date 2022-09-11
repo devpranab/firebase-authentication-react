@@ -14,7 +14,9 @@ function App() {
     name: '',
     email: '',
     password: '',
-    photo: ''
+    photo: '',
+    error: '',
+    success: false
   });
 
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -58,7 +60,6 @@ function App() {
   }
 
   const handleChange = (e) => {
-    //debugger;
     let isFormValid = true;
     if(e.target.name === "email"){
     isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
@@ -76,9 +77,28 @@ function App() {
     }
   }
 
-  const handleSubmit = () => {
- 
+  const handleSubmit = (e) => {
+  console.log(user.email, user.password);
+  if(user.name && user.password){
+    //console.log("Form Submitted");
+    firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+    .then(res => {
+      console.log(res);
+      const newUserInfo = {...user};
+      newUserInfo.error = "";
+      newUserInfo.success = true;
+      setUser(newUserInfo);
+    })
+    .catch(error => {
+    //Handle Errors here
+    const newUserInfo = {...user};
+    newUserInfo.error = error.message;
+    newUserInfo.success = false;
+    setUser(newUserInfo);
+    });
   }
+  e.preventDefault();
+}
 
   return (
     <div className="App">
@@ -95,9 +115,6 @@ function App() {
     }
     {/* create simple login form email and password */}
     <h2>Our own Authentication</h2>
-    <p>Name: {user.name}</p>
-    <p>Email: {user.email}</p>
-    <p>Password: {user.password}</p>
   <form action="" onSubmit={handleSubmit}>
   <label htmlFor="">Your Name: </label>
     <input type="text" onChange={handleChange} name="name" placeholder="" required/>
@@ -110,6 +127,9 @@ function App() {
     <br />
     <input type="submit" value="Submit" />
   </form>
+  <p style={{color: "red"}}>{user.error}</p>
+
+  {user.success && <p style={{color: "green"}}>Successfully user created!</p>}
     </div>
   );
 }
