@@ -230,3 +230,78 @@ function App() {
 
 export default App;
 ```
+## Login Form And Route Integration:
+### create simple login form email and password:
+```js
+  const handleChange = (e) => {
+    console.log(e.target.name, e.target.value);
+  }
+
+  const handleSubmit = () => {
+
+  }
+  //after return
+      {/* create simple login form email and password */}
+    <h2>Our own Authentication</h2>
+  <form action="" onSubmit={handleSubmit}>
+  <label htmlFor="">Your Email: </label>
+    <input type="text" onChange={handleChange} name="email" placeholder=""/>
+    <br />
+    <label htmlFor="">Your Password: </label>
+    <input type="password" onChange={handleChange} name="password" placeholder=""/>
+    <br />
+    <input type="submit" value="Submit" />
+  </form>
+```
+
+### form field validation using regular expression:
+<p>raw regex validation no used framework</p>
+```js
+  const handleChange = (e) => {
+    //console.log(e.target.name, e.target.value);
+    if(e.target.name === "email"){
+    const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
+    console.log(isEmailValid);
+    }
+    if(e.target.name === "password"){
+    const isPasswordValid = e.target.value.length > 6;
+    const passwordHasNumber = /\d{1}/.test(e.target.value);
+    console.log(isPasswordValid && passwordHasNumber);
+    }
+  }
+```
+
+### update State from Form Field:
+```js
+  const [user, setUser] = useState({
+    isSignedIn : false,
+    name: '',
+    email: '',
+    password: '',
+    photo: ''
+  });
+
+    const handleChange = (e) => {
+    //debugger;
+    let isFormValid = true;
+    if(e.target.name === "email"){
+    isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
+    }
+    if(e.target.name === "password"){
+    const isPasswordValid = e.target.value.length > 6;
+    const passwordHasNumber = /\d{1}/.test(e.target.value);
+    isFormValid = isPasswordValid && passwordHasNumber;
+    }
+    if(isFormValid){
+      // if true isFormValid then work this
+      const newUserInfo = {...user};
+      newUserInfo[e.target.name] = e.target.value;
+      setUser(newUserInfo);
+    }
+  }
+```
+
+### create new user and handle error message:
+### toggle sign in and sign up form:
+### update user name and other information to firebase:
+### how to handle facebook login:
