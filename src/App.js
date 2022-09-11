@@ -7,8 +7,8 @@ import "firebase/auth";
 import firebaseConfig from './firebase.config.js';
 firebase.initializeApp(firebaseConfig);
 
-
 function App() {
+  const [newUser, setNewUser] = useState(false);
   const [user, setUser] = useState({
     isSignedIn : false,
     name: '',
@@ -19,10 +19,12 @@ function App() {
     success: false
   });
 
+
+
   const provider = new firebase.auth.GoogleAuthProvider();
 
   const handleSignIn = () => {
-    console.log("handleSignIn clicked");
+    //console.log("handleSignIn clicked");
     firebase.auth().signInWithPopup(provider)
     .then(res => {
       const {displayName, photoURL, email} = res.user;
@@ -42,7 +44,7 @@ function App() {
   }
 
   const handleSignOut = () => {
-    console.log("handleSignOut clicked");
+    //console.log("handleSignOut clicked");
     firebase.auth().signOut()
     .then(res => {
       const signedOutUser = {
@@ -78,8 +80,8 @@ function App() {
   }
 
   const handleSubmit = (e) => {
-  console.log(user.email, user.password);
-  if(user.name && user.password){
+  //console.log(user.email, user.password);
+  if(newUser && user.email && user.password){
     //console.log("Form Submitted");
     firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
     .then(res => {
@@ -96,6 +98,22 @@ function App() {
     newUserInfo.success = false;
     setUser(newUserInfo);
     });
+  }
+  if(!newUser && user.email && user.password){
+    firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+    .then(res => {
+      const newUserInfo = {...user};
+      newUserInfo.error = "";
+      newUserInfo.success = true;
+      setUser(newUserInfo);
+    })
+    .catch(error => {
+      //Handle Errors here
+      const newUserInfo = {...user};
+      newUserInfo.error = error.message;
+      newUserInfo.success = false;
+      setUser(newUserInfo);
+      });
   }
   e.preventDefault();
 }
@@ -114,22 +132,24 @@ function App() {
       </div>
     }
     {/* create simple login form email and password */}
-    <h2>Our own Authentication</h2>
+    <h2>Our own Firebase Authentication</h2>
+    <input type="checkbox" onChange={() => setNewUser(!newUser)} name="newUser"/>
+    <label htmlFor="newUser">New User Sign up</label>
   <form action="" onSubmit={handleSubmit}>
-  <label htmlFor="">Your Name: </label>
-    <input type="text" onChange={handleChange} name="name" placeholder="" required/>
+  {
+    newUser && 
+    <input type="text" onChange={handleChange} name="name" placeholder="your name" required/>
+  }
     <br />
-  <label htmlFor="">Your Email: </label>
-    <input type="text" onChange={handleChange} name="email" placeholder="" required/>
+    <input type="text" onChange={handleChange} name="email" placeholder="your email" required/>
     <br />
-    <label htmlFor="">Your Password: </label>
-    <input type="password" onChange={handleChange} name="password" placeholder="" required/>
+    <input type="password" onChange={handleChange} name="password" placeholder="your passwor" required/>
     <br />
     <input type="submit" value="Submit" />
   </form>
   <p style={{color: "red"}}>{user.error}</p>
 
-  {user.success && <p style={{color: "green"}}>Successfully user created!</p>}
+  {user.success && <p style={{color: "blue"}}>Successfully user {newUser ? "created" : "logged in"}!</p>}
     </div>
   );
 }
